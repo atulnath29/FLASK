@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>{% block title %}{% endblock %} - My Webpage</title>
+    {% endblock %}
+</head>
+
+<body class="bg-gray-900 font-mono">
+    <div id="content" class="w-screen h-screen flex flex-col items-center text-white ">
+        {% block content %}
+        {% endblock %}
+        <div id="footer" class="w-screen flex justify-center items-center p-3">
+            {% block footer %}
+            &copy; Copyright 2008 by <a href="#">Me Japanij</a>.
+            {% endblock %}
+        </div>
+    </div>
+</body>
+
+</html>
