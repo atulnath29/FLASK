@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modern Tailwind Landing Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#4f46e5'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 text-gray-800 scroll-smooth">
+
+  <!-- Navbar -->
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <h1 class="text-2xl font-bold text-brand">BrandName</h1>
+        <nav class="hidden md:flex space-x-6">
+          <a href="#home" class="hover:text-brand">Home</a>
+          <a href="#features" class="hover:text-brand">Features</a>
+          <a href="#pricing" class="hover:text-brand">Pricing</a>
+          <a href="#contact" class="hover:text-brand">Contact</a>
+        </nav>
+        <a href="#contact" class="hidden md:inline-block bg-brand text-white px-4 py-2 rounded-lg hover:opacity-90">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="py-20">
+    <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h2 class="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
+          Build Modern Websites Faster with Tailwind CSS
+        </h2>
+        <p class="text-lg text-gray-600 mb-8">
+          A clean, responsive, and professional webpage template built using
+          HTML and Tailwind CSS — perfect for startups, portfolios, and projects.
+        </p>
+        <div class="flex gap-4">
+          <a href="#pricing" class="bg-brand text-white px-6 py-3 rounded-lg hover:opacity-90">View Pricing</a>
+          <a href="#features" class="border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-100">Learn More</a>
+        </div>
+      </div>
+      <div class="bg-gradient-to-tr from-indigo-500 to-purple-600 h-80 rounded-2xl shadow-lg"></div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-14">
+        <h3 class="text-3xl font-bold mb-4">Awesome Features</h3>
+        <p class="text-gray-600">Everything you need to build beautiful modern pages.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="p-8 rounded-xl shadow hover:shadow-lg transition">
+          <h4 class="font-semibold text-xl mb-3">Responsive Design</h4>
+          <p class="text-gray-600">Looks great on mobile, tablet, and desktop without extra work.</p>
+        </div>
+        <div class="p-8 rounded-xl shadow hover:shadow-lg transition">
+          <h4 class="font-semibold text-xl mb-3">Fast Development</h4>
+          <p class="text-gray-600">Utility classes let you build layouts quickly and consistently.</p>
+        </div>
+        <div class="p-8 rounded-xl shadow hover:shadow-lg transition">
+          <h4 class="font-semibold text-xl mb-3">Easy Customization</h4>
+          <p class="text-gray-600">Modify styles easily to match branding or project needs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="py-20">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-14">
+        <h3 class="text-3xl font-bold mb-4">Simple Pricing</h3>
+        <p class="text-gray-600">Choose a plan that fits your needs.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-white p-8 rounded-xl shadow">
+          <h4 class="font-bold text-xl mb-4">Starter</h4>
+          <p class="text-4xl font-bold mb-6">$0</p>
+          <ul class="space-y-2 mb-6 text-gray-600">
+            <li>✔ Basic Features</li>
+            <li>✔ Community Support</li>
+            <li>✔ Free Updates</li>
+          </ul>
+          <button class="w-full border py-2 rounded-lg hover:bg-gray-100">Choose</button>
+        </div>
+
+        <div class="bg-brand text-white p-8 rounded-xl shadow-lg scale-105">
+          <h4 class="font-bold text-xl mb-4">Pro</h4>
+          <p class="text-4xl font-bold mb-6">$19</p>
+          <ul class="space-y-2 mb-6">
+            <li>✔ All Starter Features</li>
+            <li>✔ Premium Support</li>
+            <li>✔ Advanced Tools</li>
+          </ul>
+          <button class="w-full bg-white text-brand py-2 rounded-lg hover:opacity-90">Choose</button>
+        </div>
+
+        <div class="bg-white p-8 rounded-xl shadow">
+          <h4 class="font-bold text-xl mb-4">Enterprise</h4>
+          <p class="text-4xl font-bold mb-6">$49</p>
+          <ul class="space-y-2 mb-6 text-gray-600">
+            <li>✔ All Pro Features</li>
+            <li>✔ Dedicated Support</li>
+            <li>✔ Custom Solutions</li>
+          </ul>
+          <button class="w-full border py-2 rounded-lg hover:bg-gray-100">Choose</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="py-20 bg-white">
+    <div class="max-w-3xl mx-auto px-4">
+      <div class="text-center mb-10">
+        <h3 class="text-3xl font-bold mb-4">Contact Us</h3>
+        <p class="text-gray-600">Send us a message and we'll get back to you.</p>
+      </div>
+
+      <form class="grid gap-6">
+        <input type="text" placeholder="Your Name" class="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand">
+        <input type="email" placeholder="Your Email" class="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand">
+        <textarea rows="4" placeholder="Your Message" class="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand"></textarea>
+        <button class="bg-brand text-white py-3 rounded-lg hover:opacity-90">Send Message</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-400 py-10">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p>© 2026 BrandName. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
