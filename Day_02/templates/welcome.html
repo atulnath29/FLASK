@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="bg-gray-900">
+    <h1 class="m-4 text-4xl text-white font-mono font-bold">Welcome back, {{ name | capitalize }}</h1>
+    <h1 class="m-4 text-4xl text-white font-mono font-bold">Welcome back, {{ name | lower }}</h1>
+    <h1 class="m-4 text-4xl text-white font-mono font-bold">Welcome back, {{ name | upper }}</h1>
+    <h1 class="m-4 text-4xl text-white font-mono font-bold">{{ text | truncate(20) }}</h1>
+    <h1 class="m-4 text-4xl text-white font-mono font-bold">These fruits are my favorite {{ fruits | join(", ") }}</h1>
+    <h1 class="m-4 text-4xl text-white font-mono font-bold">{{ num1 + num2 | round(2) }}</h1>
+    <h1 class="m-4 text-4xl text-white font-mono font-bold">{{ nums | sum }}</h1>
+    <h1 class="m-4 text-4xl text-white font-mono font-bold">{{ fruits.0 + " " +fruits.2 }}</h1>
+</body>
+
+</html>
