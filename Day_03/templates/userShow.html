@@ -1,0 +1,33 @@
+{% extends "userBase.html" %}
+{% block title %}UserShow{% endblock %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+        .important { color: #336699; }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="w-1/2 h-[60%] p-3 my-10 bg-gray-800/50 flex flex-col items-center  rounded-md">
+        <p class="my-3 text-3xl font-bold">Users Table</p>
+        <table class="mx-auto w-[90%] text-left rtl:text-right table-fixed">
+            <thead class="text-xl bg-neutral-secondary-soft border-b rounded-base border-default bg-white/20">
+                <tr class="text-bold">
+                <th scope="col" class="px-6 py-3 font-medium">ID</th>
+                <th scope="col" class="px-6 py-3 font-medium">Name</th>
+                <th scope="col" class="px-6 py-3 font-medium">Role</th>
+                <th scope="col" class="px-6 py-3 font-medium">Email</th>
+                </tr>
+            </thead>
+            <tbody class="text-md">
+                {% for user in users %}
+                    <tr class="even:bg-white/20 bg-neutral-primary border-b border-default">
+                        <td class="px-6 py-4">{{ user.id | capitalize}}</td>
+                        <td class="px-6 py-4">{{ user.name | capitalize}}</td>
+                        <td class="px-6 py-4">{{ user.role | capitalize}}</td>
+                        <td class="px-6 py-4">{{ user.email}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
