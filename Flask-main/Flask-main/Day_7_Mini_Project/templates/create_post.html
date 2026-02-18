@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<div class="container">
+    <h2>Create Post ({{user}})</h2>
+
+    <form method="post">
+        <textarea name="post" rows="5" placeholder="Write something..." required></textarea>
+        <button type="submit">Post</button>
+    </form>
+
+    <br>
+    <a href="/posts">View Posts</a> |
+    <a href="/logout">Logout</a>
+</div>

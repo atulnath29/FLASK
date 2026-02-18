@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Post Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      table {
+        width: 80%;
+        margin: auto;
+        border-collapse: collapse;
+        background: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+      th {
+        background: #007bff;
+        color: white;
+      }
+      tr:nth-child(even) {
+        background: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Post Page</h1>
+
+    <table>
+        <thead>
+      <tr>
+        <th>Sno.</th>
+        <th>Author</th>
+        <th>Title</th>
+        <th>Post</th>
+      </tr>
+    </thead>
+      <tbody>
+        {% for User, post in posts %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ post.username }}</td>
+          <td>{{ post.title }}</td>
+          <td>{{ post.content }}</td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+  </body>
+</html>

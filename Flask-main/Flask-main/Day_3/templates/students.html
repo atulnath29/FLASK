@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Students Table</title>
+    <style>
+        table{
+            border-collapse: collapse;
+            width: 60%;
+        }
+        th, td{
+            border:1px solid black;
+            padding:8px;
+            text-align:center;
+        }
+        th{
+            background: lightgray;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Students List</h2>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Course</th>
+        <th>City</th>
+    </tr>
+
+    {% for student in students %}
+    <tr>
+        <td>{{ student.name }}</td>
+        <td>{{ student.course }}</td>
+        <td>{{ student.city }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+</body>
+</html>

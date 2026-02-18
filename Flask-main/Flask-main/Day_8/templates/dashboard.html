@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Welcome {{ username }}</h1>
+<h3>Your Role : {{ role }}</h3>
+
+<br><br>
+
+<a href="/tasks" class="add-btn">Manage Tasks</a>
+
+{% if role == "Admin" %}
+    <a href="/users" class="add-btn">Manage Users</a>
+{% endif %}
+
+{% endblock %}

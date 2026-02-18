@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="center">Login</h2>
+
+<form method="POST" class="login-form">
+    <input name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button>Login</button>
+</form>
+
+{% with messages = get_flashed_messages() %}
+<p class="error">{{ messages[0] }}</p>
+{% endwith %}
+{% endblock %}

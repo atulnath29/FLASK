@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+    <form method="GET">
+        <input type="text" name="search" placeholder="Search product" class="form-control">
+    </form>
+    <a href="/add" class="btn btn-primary">Add Product</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Qty</th>
+        <th>Price</th>
+        <th>Category</th>
+        <th>Action</th>
+    </tr>
+
+    {% for p in products %}
+    <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.quantity }}</td>
+        <td>{{ p.price }}</td>
+        <td>{{ p.category }}</td>
+        <td>
+            <a href="/update/{{p.id}}" class="btn btn-warning btn-sm">Edit</a>
+            <a href="/delete/{{p.id}}" class="btn btn-danger btn-sm">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

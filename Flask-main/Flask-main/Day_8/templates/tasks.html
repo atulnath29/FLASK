@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Task Manager</h2>
+
+<table>
+<tr><th>ID</th><th>Task</th><th>Status</th><th>Action</th></tr>
+{% for task in tasks %}
+<tr>
+<td>{{task.id}}</td>
+<td>{{task.title}}</td>
+<td>{{task.status}}</td>
+<td><a href="/toggle_task/{{task.id}}" class="edit-btn">Toggle</a></td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,21 @@
+    {% extends "students.html" %}
+    {% block body%}
+        <h2>Students List</h2>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Course</th>
+        <th>City</th>
+    </tr>
+
+    {% for student in students %}
+    <tr>
+        <td>{{ student.name }}</td>
+        <td>{{ student.course }}</td>
+        <td>{{ student.city }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+    {% endblock %}

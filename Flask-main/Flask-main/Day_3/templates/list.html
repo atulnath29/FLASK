@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Courses List</title>
+</head>
+<body>
+
+    <h2>Available Courses</h2>
+
+    <ul>
+        {% for course in courses %}
+            <li>{{ course }}</li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>

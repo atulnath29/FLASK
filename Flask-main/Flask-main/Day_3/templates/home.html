@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+</head>
+<body>
+    {% if age >= 18 %}
+        <h3>User can vote.</h3>
+    {% else %}
+        <h3>User cannot vote.</h3>
+    {% endif %}
+
+    Thank you {{ user_name }} for visiting our website.
+</body>
+</html>
