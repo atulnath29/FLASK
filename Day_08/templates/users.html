@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="display:flex; justify-content:space-between;">
+<a href="/add_user" class="add-btn">+ Add User</a>
+<a href="/logout" class="logout-btn">Logout</a>
+</div>
+
+<h2>All Users</h2>
+
+<table>
+<tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+{% for user in users %}
+<tr>
+<td>{{user.id}}</td>
+<td>{{user.username}}</td>
+<td>{{user.email}}</td>
+<td>{{user.role}}</td>
+<td>
+<a href="/edit_user/{{user.id}}" class="edit-btn">Edit</a>
+<a href="/delete_user/{{user.id}}" class="delete-btn">Delete</a>
+</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

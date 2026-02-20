@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Edit User</h2>
+<form method="POST" class="login-form">
+<input name="username" value="{{user.username}}">
+<input name="email" value="{{user.email}}">
+<input name="password" value="{{user.password}}">
+<select name="role">
+<option {% if user.role=='Admin' %}selected{% endif %}>Admin</option>
+<option {% if user.role=='Editor' %}selected{% endif %}>Editor</option>
+<option {% if user.role=='User' %}selected{% endif %}>User</option>
+</select>
+<button>Update</button>
+</form>
+{% endblock %}

@@ -1,0 +1,13 @@
+body{font-family:Arial;background:#f4f6f9;margin:0}
+.navbar{background:#2c3e50;color:#fff;padding:15px}
+.container{width:80%;margin:40px auto;background:#fff;padding:30px;border-radius:8px}
+.login-form{width:300px;margin:auto;display:flex;flex-direction:column}
+.login-form input,select{margin:10px 0;padding:10px}
+.login-form button{padding:10px;background:#27ae60;color:white;border:none}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th{background:#3498db;color:#fff;padding:10px}
+td{padding:10px;border-bottom:1px solid #ddd}
+.add-btn{background:#27ae60;color:#fff;padding:6px 10px;text-decoration:none}
+.edit-btn{background:#f39c12;color:#fff;padding:6px 10px;text-decoration:none}
+.delete-btn{background:#e74c3c;color:#fff;padding:6px 10px;text-decoration:none}
+.logout-btn{background:red;color:#fff;padding:6px 10px;text-decoration:none}
