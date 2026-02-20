@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Flask User System</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body{
+    background: linear-gradient(120deg,#2980b9,#6dd5fa);
+    min-height:100vh;
+}
+
+/* NAVBAR */
+nav{
+    background:#1f2a44;
+    padding:15px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+nav h2{
+    color:white;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    margin-left:20px;
+    font-weight:500;
+    transition:0.3s;
+}
+
+nav a:hover{
+    color:#6dd5fa;
+}
+
+/* MAIN CARD */
+.container{
+    width:420px;
+    margin:60px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.2);
+    animation:fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(20px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+h1,h2,h3{
+    text-align:center;
+    margin-bottom:20px;
+    color:#333;
+}
+
+/* FORM */
+input,select{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:8px;
+    border:1px solid #ccc;
+    transition:0.3s;
+}
+
+input:focus,select:focus{
+    border-color:#2980b9;
+    outline:none;
+    box-shadow:0 0 5px rgba(41,128,185,0.4);
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    border:none;
+    border-radius:8px;
+    background:#2980b9;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#1f6391;
+}
+
+/* TABLE */
+table{
+    width:90%;
+    margin:40px auto;
+    border-collapse:collapse;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+th{
+    background:#1f2a44;
+    color:white;
+    padding:15px;
+}
+
+td{
+    padding:12px;
+    text-align:center;
+    border-bottom:1px solid #eee;
+}
+
+tr:hover{
+    background:#f1f7ff;
+}
+
+/* HOME HERO */
+.hero{
+    text-align:center;
+    color:white;
+    margin-top:100px;
+}
+
+.hero h1{
+    font-size:42px;
+    color:white;
+}
+
+.hero p{
+    font-size:18px;
+    opacity:0.9;
+}
+</style>
+
+</head>
+<body>
+
+<nav>
+    <h2>Flask User System</h2>
+    <div>
+        <a href="/">Home</a>
+        <a href="/register">Register</a>
+        <a href="/login">Login</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/users">Users</a>
+        <a href="/logout">Logout</a>
+    </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>
