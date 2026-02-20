@@ -1,0 +1,133 @@
+<link rel="stylesheet" href="/static/style.css">
+
+<div class="container">
+    <h1>Store Dashboard</h1>
+
+    <div class="card">
+        <h3>Add Product</h3>
+        <input id="name" placeholder="Name">
+        <input id="price" placeholder="Price">
+        <input id="qty" placeholder="Qty">
+        <button onclick="addProduct()">Add Product</button>
+    </div>
+
+    <h3>Products</h3>
+    <table id="table"></table>
+
+    <hr>
+
+    <div class="card">
+        <h3>Place Order</h3>
+        <input id="pid" placeholder="Product ID">
+        <input id="oqty" placeholder="Quantity">
+        <button onclick="placeOrder()">Order</button>
+    </div>
+
+    <hr>
+        <h2>Order History</h2>
+        <table id="ordersTable"></table>
+
+    <hr>
+
+    <div class="card">
+        <h3>Create Blog Post</h3>
+        <input id="ptitle" placeholder="Post title">
+        <input id="pcontent" placeholder="Post content">
+        <button onclick="addPost()">Publish Post</button>
+    </div>
+
+    <h3>Posts</h3>
+    <div id="posts"></div>
+</div>
+
+<script>
+
+    async function loadProducts(){
+    let res = await fetch("/api/products");
+    let data = await res.json();
+
+    let html = "<tr><th>ID</th><th>Name</th><th>Price</th><th>Qty</th></tr>";
+    data.forEach(p=>{
+        html += `<tr>
+                    <td>${p.id}</td>
+                    <td>${p.name}</td>
+                    <td>₹${p.price}</td>
+                    <td>${p.qty}</td>
+                 </tr>`;
+    });
+    document.getElementById("table").innerHTML = html;
+}
+
+async function addProduct(){
+    await fetch("/api/products",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            name: document.getElementById("name").value,
+            price: Number(document.getElementById("price").value),
+            qty: Number(document.getElementById("qty").value)
+        })
+    });
+    loadProducts();
+}
+
+async function placeOrder(){
+    await fetch("/api/order",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            product_id:Number(document.getElementById("pid").value),
+            quantity:Number(document.getElementById("oqty").value)
+        })
+    });
+    loadProducts();
+    loadOrders();   
+}
+
+
+async function loadOrders(){
+    let res = await fetch("/api/orders");
+    let data = await res.json();
+
+    let html = "<tr><th>Order ID</th><th>Product ID</th><th>Quantity</th></tr>";
+    data.forEach(o=>{
+        html += `<tr>
+                    <td>${o.id}</td>
+                    <td>${o.product_id}</td>
+                    <td>${o.quantity}</td>
+                 </tr>`;
+    });
+    document.getElementById("ordersTable").innerHTML = html;
+}
+
+
+async function loadPosts(){
+    let res = await fetch("/api/posts");
+    let data = await res.json();
+
+    let html="";
+    data.forEach(p=>{
+        html += `<div class="post">
+                    <h4>${p.title}</h4>
+                    <p>${p.content}</p>
+                 </div>`;
+    });
+    document.getElementById("posts").innerHTML = html;
+}
+
+async function addPost(){
+    await fetch("/api/posts",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            title: document.getElementById("ptitle").value,
+            content: document.getElementById("pcontent").value
+        })
+    });
+    loadPosts();
+}
+
+loadProducts();
+loadPosts();
+loadOrders();
+</script>
