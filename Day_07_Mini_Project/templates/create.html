@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post — Flask Post App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --ink: #1a1a2e;
+            --paper: #f5f0e8;
+            --accent: #c9473b;
+            --accent-dark: #a33028;
+            --muted: #7a7a8a;
+            --line: #d8d0c0;
+            --card-bg: #ffffff;
+            --input-bg: #faf7f2;
+        }
+
+        html { height: 100%; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(ellipse at 10% 80%, rgba(201, 71, 59, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 20%, rgba(26, 26, 46, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            left: 50%;
+            top: 0;
+            width: 1px;
+            height: 100vh;
+            background: linear-gradient(to bottom, transparent, var(--line) 30%, var(--line) 70%, transparent);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header */
+        header {
+            position: relative;
+            z-index: 1;
+            padding: 2.5rem 3rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--line);
+            animation: fadeDown 0.6s ease both;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--ink);
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .logo span { color: var(--accent); }
+
+        .header-tag {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border: 1px solid var(--line);
+            padding: 0.3rem 0.8rem;
+            border-radius: 100px;
+        }
+
+        /* Main */
+        main {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 4rem 2rem;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 3rem 3rem 2.5rem;
+            width: 100%;
+            max-width: 640px;
+            box-shadow: 0 4px 30px rgba(26, 26, 46, 0.08);
+            animation: fadeUp 0.7s ease 0.1s both;
+        }
+
+        .card-eyebrow {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .card-eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-subtitle {
+            font-size: 0.88rem;
+            color: var(--muted);
+            font-weight: 300;
+            margin-bottom: 2.2rem;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1.4rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--input-bg);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            appearance: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(201, 71, 59, 0.1);
+            background: #fff;
+        }
+
+        input::placeholder {
+            color: #ccc;
+            font-weight: 700;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: var(--input-bg);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.93rem;
+            font-weight: 300;
+            color: var(--ink);
+            line-height: 1.75;
+            outline: none;
+            resize: vertical;
+            min-height: 180px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(201, 71, 59, 0.1);
+            background: #fff;
+        }
+
+        textarea::placeholder {
+            color: #bbb;
+            font-weight: 300;
+        }
+
+        /* Character count */
+        .field-meta {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.4rem;
+        }
+
+        .char-count {
+            font-size: 0.72rem;
+            color: var(--muted);
+            letter-spacing: 0.03em;
+        }
+
+        /* Submit button */
+        .btn-submit {
+            width: 100%;
+            padding: 0.9rem 1.5rem;
+            margin-top: 0.5rem;
+            background: var(--ink);
+            color: #fff;
+            border: 1px solid var(--ink);
+            border-radius: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(201, 71, 59, 0.28);
+        }
+
+        .btn-submit:active { transform: translateY(0); }
+
+        .btn-icon {
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        /* Divider */
+        .card-divider {
+            height: 1px;
+            background: var(--line);
+            margin: 1.8rem 0 1.5rem;
+        }
+
+        /* Nav links */
+        .card-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .card-links a {
+            font-size: 0.83rem;
+            color: var(--muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: color 0.18s ease;
+        }
+
+        .card-links a:hover { color: var(--accent); }
+
+        .card-links a .arrow {
+            font-size: 0.75rem;
+            transition: transform 0.18s ease;
+        }
+
+        .card-links a:hover .arrow { transform: translateX(3px); }
+
+        .link-sep {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--line);
+        }
+
+        .card-links a.danger:hover { color: #999; }
+
+        /* Dot grid */
+        .dot-grid {
+            position: fixed;
+            bottom: 3rem;
+            right: 3rem;
+            display: grid;
+            grid-template-columns: repeat(5, 9px);
+            gap: 6px;
+            opacity: 0.18;
+            z-index: 0;
+        }
+
+        .dot-grid span {
+            display: block;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--ink);
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 1;
+            padding: 1.5rem 3rem;
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeUp 0.7s ease 0.5s both;
+        }
+
+        .footer-copy {
+            font-size: 0.72rem;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+        }
+
+        .footer-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            header { padding: 1.5rem; }
+            .card { padding: 2rem 1.5rem; }
+            .dot-grid { display: none; }
+            footer { padding: 1.2rem 1.5rem; }
+            .card-links { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dot-grid">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <header>
+        <a href="/" class="logo">Flask <span>&bull;</span> Post</a>
+        <span class="header-tag">New Post</span>
+    </header>
+
+    <main>
+        <div class="card">
+            <div class="card-eyebrow">Write something</div>
+            <h2>Create New Post</h2>
+            <p class="card-subtitle">Share your thoughts with the world. Fill in a title and your content below.</p>
+
+            <form method="POST">
+
+                <div class="form-group">
+                    <label for="title">Post Title</label>
+                    <input type="text" id="title" name="title" placeholder="Your headline here…" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="content">Post Content</label>
+                    <textarea
+                        id="content"
+                        name="content"
+                        rows="5"
+                        cols="40"
+                        placeholder="Start writing your post…"
+                        required
+                        oninput="updateCount(this)"
+                    ></textarea>
+                    <div class="field-meta">
+                        <span class="char-count" id="charCount">0 characters</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <span class="btn-icon">✦</span> Publish Post
+                </button>
+
+            </form>
+
+            <div class="card-divider"></div>
+
+            <div class="card-links">
+                <a href="/view">
+                    View Posts <span class="arrow">→</span>
+                </a>
+                <div class="link-sep"></div>
+                <a href="/">
+                    ← Home
+                </a>
+                <div class="link-sep"></div>
+                <a href="/logout" class="danger">Sign Out</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <span class="footer-copy">Flask Post App &copy; 2025</span>
+        <div class="footer-dot"></div>
+        <span class="footer-copy">Built with Flask</span>
+    </footer>
+
+    <script>
+        function updateCount(el) {
+            const count = el.value.length;
+            const label = count === 1 ? 'character' : 'characters';
+            document.getElementById('charCount').textContent = count.toLocaleString() + ' ' + label;
+        }
+    </script>
+
+</body>
+</html>
