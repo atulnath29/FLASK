@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Success</title>
+
+    <style>
+        body{
+            font-family: Arial;
+            background: linear-gradient(to right,#89f7fe,#66a6ff);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+        }
+
+        .card{
+            background:white;
+            padding:30px;
+            border-radius:10px;
+            box-shadow:0 0 15px rgba(0,0,0,0.2);
+            text-align:center;
+            width:350px;
+        }
+
+        h2{
+            color:green;
+        }
+
+        p{
+            font-size:18px;
+        }
+
+        a{
+            display:inline-block;
+            margin-top:15px;
+            text-decoration:none;
+            background:#007BFF;
+            color:white;
+            padding:8px 15px;
+            border-radius:5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Registration Successful </h2>
+    <p><b>Name:</b> {{ name }}</p>
+    <p><b>Email:</b> {{ email }}</p>
+    <a href="/">Register Another</a>
+</div>
+
+</body>
+</html>
