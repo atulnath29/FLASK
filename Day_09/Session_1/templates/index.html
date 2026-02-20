@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventory Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="header-left">
+      <h1>Inven<span>tory</span></h1>
+      <p>Stock management dashboard</p>
+    </div>
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-val" id="stat-items">0</div>
+        <div class="stat-label">Products</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="stat-value">₹0</div>
+        <div class="stat-label">Total Value</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Product -->
+  <div class="card">
+    <div class="card-title"><span></span>Add New Product</div>
+    <div class="form-row">
+      <input id="name" placeholder="Product name" autocomplete="off">
+      <input id="qty" type="number" placeholder="Quantity" min="0">
+      <input id="price" type="number" placeholder="Price (₹)" min="0">
+      <button class="btn-primary" onclick="addProduct()">+ Add</button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-row">
+    <input id="search" placeholder="Search products..." onkeyup="loadProducts()" autocomplete="off">
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Update Stock</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr>
+          <td colspan="5">
+            <div class="empty">
+              <div class="empty-icon">📦</div>
+              <p>No products yet. Add one above.</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  async function loadProducts() {
+    const search = document.getElementById('search').value;
+    try {
+      const res = await fetch('/api/products?search=' + encodeURIComponent(search));
+      const products = await res.json();
+      const tbody = document.getElementById('tbody');
+
+      document.getElementById('stat-items').textContent = products.length;
+      const totalVal = products.reduce((s, p) => s + p.price * p.qty, 0);
+      document.getElementById('stat-value').textContent = '₹' + totalVal.toLocaleString('en-IN');
+
+      if (!products.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">🔍</div><p>No products match your search.</p></div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = products.map((p, i) => `
+        <tr style="animation-delay:${i * 0.04}s">
+          <td><span class="product-name">${escHtml(p.name)}</span></td>
+          <td><span class="qty-badge ${p.qty < 5 ? 'low' : ''}">${p.qty}</span></td>
+          <td><span class="price-val">₹${Number(p.price).toLocaleString('en-IN')}</span></td>
+          <td>
+            <div class="update-cell">
+              <input id="c${p.id}" type="number" placeholder="+/−" title="Enter positive or negative number">
+              <button class="btn-update" onclick="updateQty(${p.id})">Apply</button>
+            </div>
+          </td>
+          <td><button class="btn-delete" onclick="deleteProduct(${p.id})">Remove</button></td>
+        </tr>
+      `).join('');
+    } catch (e) {
+      showToast('Failed to load products', 'error');
+    }
+  }
+
+  async function addProduct() {
+    const name = document.getElementById('name').value.trim();
+    const qty = document.getElementById('qty').value;
+    const price = document.getElementById('price').value;
+
+    if (!name || !qty || !price) {
+      showToast('Please fill in all fields', 'error');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, qty: Number(qty), price: Number(price) })
+      });
+
+      if (!res.ok) throw new Error();
+
+      document.getElementById('name').value = '';
+      document.getElementById('qty').value = '';
+      document.getElementById('price').value = '';
+
+      showToast(`"${name}" added to inventory`);
+      loadProducts();
+    } catch {
+      showToast('Failed to add product', 'error');
+    }
+  }
+
+  async function updateQty(id) {
+    const change = document.getElementById('c' + id).value;
+    if (!change) { showToast('Enter a quantity change (+/−)', 'error'); return; }
+
+    try {
+      const res = await fetch('/api/update/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ change: Number(change) })
+      });
+      if (!res.ok) throw new Error();
+      showToast('Stock updated');
+      loadProducts();
+    } catch {
+      showToast('Failed to update stock', 'error');
+    }
+  }
+
+  async function deleteProduct(id) {
+    if (!confirm('Remove this product?')) return;
+    try {
+      await fetch('/api/delete/' + id, { method: 'DELETE' });
+      showToast('Product removed');
+      loadProducts();
+    } catch {
+      showToast('Failed to delete product', 'error');
+    }
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  loadProducts();
+</script>
+</body>
+</html>
