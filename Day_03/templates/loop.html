@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+</head>
+<body>
+    {% for item in text %}
+        <h3>Looping {{ item }}</h3>
+    {% endfor %}
+
+    Thank you {{ user_name }} for visiting our website.
+</body>
+</html>

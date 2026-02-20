@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shopping Mall Entry System</title>
+
+<style>
+    body{
+        margin:0;
+        font-family: Arial, Helvetica, sans-serif;
+        background:#f4f6f9;
+    }
+
+    /* NAVBAR */
+    .navbar{
+        background: linear-gradient(90deg,#1e3c72,#2a5298);
+        padding:15px 30px;
+        color:white;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        box-shadow:0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .navbar h2{
+        margin:0;
+        letter-spacing:1px;
+    }
+
+    .nav-links a{
+        color:white;
+        text-decoration:none;
+        margin-left:20px;
+        font-weight:bold;
+    }
+
+    .container{
+        width:85%;
+        margin:auto;
+        margin-top:30px;
+    }
+
+    /* FORM */
+    .form-box{
+        background:white;
+        padding:20px;
+        border-radius:10px;
+        box-shadow:0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom:30px;
+    }
+
+    input, select{
+        padding:10px;
+        width:23%;
+        margin:10px;
+        border-radius:5px;
+        border:1px solid #ccc;
+    }
+
+    button{
+        padding:10px 20px;
+        background:#2a5298;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+        font-weight:bold;
+    }
+
+    button:hover{
+        background:#1e3c72;
+    }
+
+    /* TABLE */
+    table{
+        width:100%;
+        border-collapse:collapse;
+        background:white;
+        box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    th{
+        background:#2a5298;
+        color:white;
+        padding:12px;
+    }
+
+    td{
+        padding:10px;
+        text-align:center;
+        border-bottom:1px solid #ddd;
+    }
+
+    .delete-btn{
+        background:red;
+        padding:5px 10px;
+        border:none;
+        color:white;
+        border-radius:4px;
+        cursor:pointer;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <h2>Shopping Mall Manager</h2>
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Add Shop</a>
+        <a href="#">Records</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- FORM -->
+    <div class="form-box">
+        <h2>Enter Shop Details</h2>
+
+        <input type="text" id="shopName" placeholder="Shop Name">
+        <input type="text" id="ownerName" placeholder="Owner Name">
+        <input type="number" id="floor" placeholder="Floor No">
+        <select id="category">
+            <option value="">Category</option>
+            <option>Clothing</option>
+            <option>Food</option>
+            <option>Electronics</option>
+            <option>Accessories</option>
+        </select>
+
+        <br>
+        <button onclick="addData()">Add Shop</button>
+    </div>
+
+    <!-- TABLE -->
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Shop Name</th>
+                <th>Owner</th>
+                <th>Floor</th>
+                <th>Category</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+</div>
+
+<script>
+function addData(){
+    let shop = document.getElementById("shopName").value;
+    let owner = document.getElementById("ownerName").value;
+    let floor = document.getElementById("floor").value;
+    let category = document.getElementById("category").value;
+
+    if(shop=="" || owner=="" || floor=="" || category==""){
+        alert("Please fill all fields");
+        return;
+    }
+
+    let table = document.getElementById("dataTable").getElementsByTagName('tbody')[0];
+    let newRow = table.insertRow();
+
+    newRow.innerHTML = `
+        <td>${shop}</td>
+        <td>${owner}</td>
+        <td>${floor}</td>
+        <td>${category}</td>
+        <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+    `;
+
+    // Clear form
+    document.getElementById("shopName").value="";
+    document.getElementById("ownerName").value="";
+    document.getElementById("floor").value="";
+    document.getElementById("category").value="";
+}
+
+function deleteRow(btn){
+    btn.parentElement.parentElement.remove();
+}
+</script>
+
+</body>
+</html>
