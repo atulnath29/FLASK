@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Invoices — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content"><h1>Invoices</h1><p>All customer invoices</p></div>
+  <div class="header-actions">
+    <a href="{{ url_for('billing') }}" class="btn btn-primary">+ New Invoice</a>
+  </div>
+</div>
+
+<div class="invoices-container">
+  {% if invoices %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>TID</th><th>Customer</th><th>Grand Total</th><th>Created By</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for inv in invoices %}
+        <tr>
+          <td><span style="font-family:monospace;font-weight:700;color:#3b6ef8">{{ inv.transaction_id }}</span></td>
+          <td><strong>{{ inv.customer_name }}</strong></td>
+          <td><strong style="color:#22c55e">${{ "%.2f"|format(inv.grand_total) }}</strong></td>
+          <td style="color:#6b7280">{{ inv.created_by_name }}</td>
+          <td style="color:#6b7280;font-size:0.82rem">{{ inv.created_at[:10] }}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <a href="{{ url_for('view_invoice', bill_id=inv.id) }}" class="btn btn-sm btn-info">Detail</a>
+              <a href="{{ url_for('display_invoice', bill_id=inv.id) }}" class="btn btn-sm btn-secondary">Print</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:50px;color:#6b7280">No invoices yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

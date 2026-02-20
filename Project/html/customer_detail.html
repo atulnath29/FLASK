@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ customer.name }} — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content"><h1>{{ customer.name }}</h1><p>Customer detail &amp; purchase history</p></div>
+  <div class="header-actions">
+    <a href="{{ url_for('customer_profile', customer_id=customer.id) }}" class="btn btn-secondary">Full Profile</a>
+    <a href="{{ url_for('customer_analytics') }}" class="btn btn-secondary">← Analytics</a>
+  </div>
+</div>
+
+<div class="customer-overview">
+  <div class="customer-info-card">
+    <h2 style="font-size:1rem;font-weight:700;margin-bottom:16px">Customer Information</h2>
+    <div class="info-row"><span class="info-label">Name</span><span class="info-value">{{ customer.name }}</span></div>
+    <div class="info-row"><span class="info-label">Phone</span><span class="info-value">{{ customer.phone or '—' }}</span></div>
+    <div class="info-row"><span class="info-label">Joined</span><span class="info-value">{{ (customer.join_date or '')[:10] }}</span></div>
+    <div class="info-row"><span class="info-label">Total Spent</span><span class="info-value" style="color:#22c55e">${{ "%.2f"|format(total_spent) }}</span></div>
+    <div class="info-row"><span class="info-label">Total Bills</span><span class="info-value">{{ bills|length }}</span></div>
+  </div>
+  <div class="trust-card">
+    <h2 style="font-size:1rem;font-weight:700;margin-bottom:16px">Trust Score</h2>
+    <div class="trust-score-big" style="color:{% if (customer.trust_score or 0) >= 20 %}#8b5cf6{% elif (customer.trust_score or 0) >= 10 %}#22c55e{% elif (customer.trust_score or 0) >= 1 %}#f59e0b{% else %}#ef4444{% endif %}">
+      {{ customer.trust_score or 0 }}
+    </div>
+    <div style="text-align:center;margin-top:10px">
+      <span class="tag-badge tag-{{ (customer.tag or 'normal') | lower }}" style="font-size:0.9rem;padding:5px 16px">{{ customer.tag or 'Unknown' }}</span>
+    </div>
+    <div style="margin-top:16px;font-size:0.8rem;color:#6b7280;text-align:center">
+      Purchases: {{ customer.total_purchases or 0 }} &bull;
+      Valid Returns: {{ customer.valid_returns or 0 }} &bull;
+      Invalid: {{ customer.invalid_returns or 0 }}
+    </div>
+  </div>
+</div>
+
+<div style="background:#fff;border-radius:14px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1px solid #e5e9f0">
+  <h2 style="font-size:1rem;font-weight:700;margin-bottom:16px">Purchase History</h2>
+  {% if bills %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>TID</th><th>Grand Total</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for b in bills %}
+        <tr>
+          <td><span style="font-family:monospace;color:#3b6ef8;font-weight:700">{{ b.transaction_id }}</span></td>
+          <td><strong style="color:#22c55e">${{ "%.2f"|format(b.grand_total) }}</strong></td>
+          <td style="color:#6b7280">{{ b.created_at[:10] }}</td>
+          <td><a href="{{ url_for('view_invoice', bill_id=b.id) }}" class="btn btn-sm btn-info">View</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p style="color:#6b7280;text-align:center;padding:30px">No purchases yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

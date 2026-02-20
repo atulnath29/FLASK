@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}{{ customer.name }} Profile — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content"><h1>{{ customer.name }}</h1><p>Complete customer profile</p></div>
+  <div class="header-actions">
+    <a href="{{ url_for('billing') }}" class="btn btn-primary">+ New Bill</a>
+    <a href="{{ url_for('customer_analytics') }}" class="btn btn-secondary">← Analytics</a>
+  </div>
+</div>
+
+{% if is_banned %}
+<div class="ban-alert">
+  <span style="font-size:1.5rem">🚫</span>
+  <div>
+    <strong>Customer Banned</strong>
+    <p style="font-size:0.875rem">This customer has a trust score of 0 or below due to multiple invalid returns.</p>
+  </div>
+</div>
+{% endif %}
+
+<div class="customer-overview" style="margin-bottom:20px">
+  <div class="customer-info-card">
+    <h2 style="font-size:1rem;font-weight:700;margin-bottom:16px">Contact Info</h2>
+    <div class="info-row"><span class="info-label">Name</span><span class="info-value">{{ customer.name }}</span></div>
+    <div class="info-row"><span class="info-label">Email</span><span class="info-value">{{ customer.email }}</span></div>
+    <div class="info-row"><span class="info-label">Phone</span><span class="info-value">{{ customer.phone or '—' }}</span></div>
+    <div class="info-row"><span class="info-label">Address</span><span class="info-value">{{ customer.address or '—' }}</span></div>
+    <div class="info-row"><span class="info-label">Joined</span><span class="info-value">{{ customer.created_at[:10] }}</span></div>
+  </div>
+  <div class="trust-card">
+    <h2 style="font-size:1rem;font-weight:700;margin-bottom:12px">Trust Score &amp; Stats</h2>
+    <div class="trust-score-big" style="color:{% if trust_score >= 20 %}#8b5cf6{% elif trust_score >= 10 %}#22c55e{% elif trust_score >= 1 %}#f59e0b{% else %}#ef4444{% endif %}">
+      {{ trust_score }}
+    </div>
+    <div style="text-align:center;margin-top:8px">
+      <span class="tag-badge tag-{{ trust_tag | lower }}" style="font-size:0.9rem;padding:5px 16px">{{ trust_tag }}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+      <div style="background:#f8fafc;border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:1.3rem;font-weight:700">{{ total_purchases }}</div>
+        <div style="font-size:0.75rem;color:#6b7280">Purchases</div>
+      </div>
+      <div style="background:#f8fafc;border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:1.3rem;font-weight:700;color:#22c55e">${{ "%.0f"|format(total_spent) }}</div>
+        <div style="font-size:0.75rem;color:#6b7280">Total Spent</div>
+      </div>
+      <div style="background:#f8fafc;border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:1.3rem;font-weight:700;color:#22c55e">{{ analytics.valid_returns if analytics else 0 }}</div>
+        <div style="font-size:0.75rem;color:#6b7280">Valid Returns</div>
+      </div>
+      <div style="background:#f8fafc;border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:1.3rem;font-weight:700;color:#ef4444">{{ analytics.invalid_returns if analytics else 0 }}</div>
+        <div style="font-size:0.75rem;color:#6b7280">Invalid Returns</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Purchase History -->
+<div style="background:#fff;border-radius:14px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1px solid #e5e9f0;margin-bottom:20px">
+  <h2 style="font-size:1rem;font-weight:700;margin-bottom:16px">🛒 Purchase History ({{ total_purchases }})</h2>
+  {% if purchases %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>TID</th><th>Total</th><th>Created By</th><th>Date</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for p in purchases %}
+        <tr>
+          <td><span style="font-family:monospace;color:#3b6ef8;font-weight:700">{{ p.transaction_id }}</span></td>
+          <td><strong style="color:#22c55e">${{ "%.2f"|format(p.grand_total) }}</strong></td>
+          <td style="color:#6b7280">{{ p.created_by_name }}</td>
+          <td style="color:#6b7280;font-size:0.82rem">{{ p.created_at[:10] }}</td>
+          <td><a href="{{ url_for('view_invoice', bill_id=p.id) }}" class="btn btn-sm btn-info">View</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p style="color:#6b7280;text-align:center;padding:20px">No purchases on record.</p>
+  {% endif %}
+</div>
+
+<!-- Return History -->
+<div style="background:#fff;border-radius:14px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1px solid #e5e9f0">
+  <h2 style="font-size:1rem;font-weight:700;margin-bottom:16px">🔄 Return History ({{ total_returns }})</h2>
+  {% if returns %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>TID</th><th>Product</th><th>Qty</th><th>Amount</th><th>Reason</th><th>Status</th><th>Valid</th><th>Date</th></tr></thead>
+      <tbody>
+        {% for r in returns %}
+        <tr>
+          <td><span style="font-family:monospace;font-size:0.8rem;color:#3b6ef8">{{ r.transaction_id }}</span></td>
+          <td>{{ r.product_name }}</td>
+          <td>{{ r.quantity }}</td>
+          <td>${{ "%.2f"|format(r.total_amount) }}</td>
+          <td style="color:#6b7280;font-size:0.82rem">{{ (r.reason or '')[:30] }}</td>
+          <td><span class="tag tag-{{ r.status }}">{{ r.status.title() }}</span></td>
+          <td>{% if r.is_valid %}<span style="color:#22c55e">✅ Yes</span>{% else %}<span style="color:#ef4444">❌ No</span>{% endif %}</td>
+          <td style="color:#6b7280;font-size:0.8rem">{{ r.created_at[:10] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p style="color:#6b7280;text-align:center;padding:20px">No returns on record.</p>
+  {% endif %}
+</div>
+{% endblock %}

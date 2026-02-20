@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Return Request — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content"><h1>New Return Request</h1><p>Submit a return for a customer</p></div>
+  <div class="header-actions">
+    <a href="{{ url_for('returns_management') }}" class="btn btn-secondary">← Back to Returns</a>
+  </div>
+</div>
+
+<div class="return-form-container">
+  <div class="form-card">
+    <form method="POST">
+      <div class="form-group">
+        <label>Select Bill (Transaction ID)</label>
+        <select name="bill_id" required>
+          <option value="">— Select a bill —</option>
+          {% for b in bills %}
+          <option value="{{ b.id }}">{{ b.transaction_id }} — {{ b.customer_name }} (${{ "%.2f"|format(b.grand_total) }}) — {{ b.created_at[:10] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Product to Return</label>
+        <select name="product_id" required>
+          <option value="">— Select product —</option>
+          {% for p in products %}
+          <option value="{{ p.id }}">{{ p.name }} — ${{ "%.2f"|format(p.price) }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" name="quantity" min="1" value="1" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Reason for Return *</label>
+        <textarea name="reason" rows="3" placeholder="Describe the reason for return..." required></textarea>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button type="submit" class="btn btn-primary">Submit Return Request</button>
+        <a href="{{ url_for('returns_management') }}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

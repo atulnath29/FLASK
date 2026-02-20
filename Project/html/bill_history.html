@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Bill History — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content"><h1>Bill History</h1><p>All billing transactions</p></div>
+  <div class="header-actions">
+    <a href="{{ url_for('billing') }}" class="btn btn-primary">+ New Bill</a>
+    <a href="{{ url_for('view_invoices') }}" class="btn btn-secondary">Invoices</a>
+  </div>
+</div>
+
+<div class="search-section">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search by TID or customer name..." oninput="filterTable()">
+  </div>
+</div>
+
+<div class="history-table-wrap">
+  {% if bills %}
+  <div class="table-wrap">
+    <table id="billsTable">
+      <thead>
+        <tr><th>TID</th><th>Customer</th><th>Phone</th><th>Subtotal</th><th>Tax</th><th>Grand Total</th><th>Created By</th><th>Date</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for b in bills %}
+        <tr>
+          <td><span style="font-family:monospace;font-weight:700;color:#3b6ef8">{{ b.transaction_id }}</span></td>
+          <td><strong>{{ b.customer_name }}</strong></td>
+          <td style="color:#6b7280">{{ b.phone_number or '—' }}</td>
+          <td>${{ "%.2f"|format(b.total_amount) }}</td>
+          <td>${{ "%.2f"|format(b.total_tax) }}</td>
+          <td><strong style="color:#22c55e">${{ "%.2f"|format(b.grand_total) }}</strong></td>
+          <td style="color:#6b7280">{{ b.created_by_name }}</td>
+          <td style="color:#6b7280;font-size:0.82rem">{{ b.created_at[:16] }}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <a href="{{ url_for('view_invoice', bill_id=b.id) }}" class="btn btn-sm btn-info">View</a>
+              <a href="{{ url_for('display_invoice', bill_id=b.id) }}" class="btn btn-sm btn-secondary">Print</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:50px;color:#6b7280">No bills yet. <a href="{{ url_for('billing') }}" style="color:#3b6ef8">Create one →</a></div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('#billsTable tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

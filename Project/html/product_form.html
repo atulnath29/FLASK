@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Product — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content">
+    <h1>{{ action }} Product</h1>
+    <p>{% if action == 'Add' %}Add a new product to inventory{% else %}Edit product details{% endif %}</p>
+  </div>
+  <div class="header-actions">
+    <a href="{{ url_for('product_list') }}" class="btn btn-secondary">← Back</a>
+  </div>
+</div>
+
+<div class="product-form-card">
+  <form method="POST" class="product-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Product Name *</label>
+        <input type="text" name="name" value="{{ product.name if product else '' }}" placeholder="e.g. Laptop Pro 15" required>
+      </div>
+      <div class="form-group">
+        <label>Category *</label>
+        <input type="text" name="category" value="{{ product.category if product else '' }}" placeholder="e.g. Electronics" required>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Price ($) *</label>
+        <input type="number" name="price" step="0.01" min="0" value="{{ product.price if product else '' }}" placeholder="0.00" required>
+      </div>
+      <div class="form-group">
+        <label>Tax Rate (%) *</label>
+        <input type="number" name="tax" step="0.01" min="0" max="100" value="{{ product.tax if product else '' }}" placeholder="0.00" required>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Quantity *</label>
+        <input type="number" name="qty" min="0" value="{{ product.qty if product else '' }}" placeholder="0" required>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+          <option value="active" {% if not product or product.status == 'active' %}selected{% endif %}>Active</option>
+          <option value="inactive" {% if product and product.status == 'inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button type="submit" class="btn btn-primary">{{ 'Save Changes' if action == 'Edit' else 'Add Product' }}</button>
+      <a href="{{ url_for('product_list') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Invoice {{ bill.transaction_id }} — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content"><h1>Invoice Detail</h1><p>{{ bill.transaction_id }}</p></div>
+  <div class="header-actions">
+    <a href="{{ url_for('display_invoice', bill_id=bill.id) }}" class="btn btn-secondary">🖨️ Print</a>
+    <a href="{{ url_for('view_invoices') }}" class="btn btn-secondary">← Back</a>
+  </div>
+</div>
+
+<div class="invoice-container">
+  <div class="invoice-header">
+    <div class="invoice-title">
+      <h1>INVOICE</h1>
+      <div class="transaction-id">{{ bill.transaction_id }}</div>
+    </div>
+    <div style="text-align:right;color:#6b7280;font-size:0.875rem">
+      <div>Date: <strong>{{ bill.created_at[:10] }}</strong></div>
+      <div>Created by: <strong>{{ bill.created_by_name }}</strong></div>
+    </div>
+  </div>
+
+  <div class="invoice-meta">
+    <div class="meta-box">
+      <h3>Bill To</h3>
+      <div style="font-weight:700;font-size:1.05rem">{{ bill.customer_name }}</div>
+      {% if bill.phone_number %}<div style="color:#6b7280;margin-top:4px">📞 {{ bill.phone_number }}</div>{% endif %}
+    </div>
+    <div class="meta-box">
+      <h3>Summary</h3>
+      <div>Subtotal: <strong>${{ "%.2f"|format(bill.total_amount) }}</strong></div>
+      <div>Tax: <strong>${{ "%.2f"|format(bill.total_tax) }}</strong></div>
+      <div style="font-size:1.1rem;font-weight:700;color:#22c55e;margin-top:8px">Total: ${{ "%.2f"|format(bill.grand_total) }}</div>
+    </div>
+  </div>
+
+  <div class="invoice-items-table">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Product</th><th>Qty</th><th>Unit Price</th><th>Tax %</th><th>Total</th></tr></thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td style="color:#6b7280">{{ loop.index }}</td>
+            <td><strong>{{ item.product_name }}</strong></td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ "%.2f"|format(item.unit_price) }}</td>
+            <td>{{ item.tax_rate }}%</td>
+            <td><strong>${{ "%.2f"|format(item.total_price) }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="invoice-totals">
+    <div class="total-row"><span>Subtotal</span><span>${{ "%.2f"|format(bill.total_amount) }}</span></div>
+    <div class="total-row"><span>Tax</span><span>${{ "%.2f"|format(bill.total_tax) }}</span></div>
+    <div class="total-row grand-total"><span>Grand Total</span><span>${{ "%.2f"|format(bill.grand_total) }}</span></div>
+  </div>
+</div>
+{% endblock %}

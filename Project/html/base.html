@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}CRM System{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <header>
+    <nav class="navbar">
+      <div class="nav-container">
+        
+        <ul class="nav-menu">
+          {% if session.user_id %}
+            <li><a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}">Dashboard</a></li>
+            <li><a href="{{ url_for('product_list') }}" class="{{ 'active' if 'product' in request.endpoint }}">Products</a></li>
+            <li><a href="{{ url_for('billing') }}" class="{{ 'active' if 'bill' in request.endpoint or request.endpoint == 'billing' }}">Billing</a></li>
+            <li><a href="{{ url_for('bill_history') }}" class="{{ 'active' if request.endpoint == 'bill_history' }}">History</a></li>
+            <li><a href="{{ url_for('transaction_search') }}" class="{{ 'active' if request.endpoint == 'transaction_search' }}">Search</a></li>
+            <li><a href="{{ url_for('customer_analytics') }}" class="{{ 'active' if 'customer' in request.endpoint or 'analytics' in request.endpoint }}">Analytics</a></li>
+            <li><a href="{{ url_for('returns_management') }}" class="{{ 'active' if 'return' in request.endpoint }}">Returns</a></li>
+            {% if session.role == 'admin' %}
+            <li><a href="{{ url_for('users') }}" class="{{ 'active' if request.endpoint == 'users' }}">Users</a></li>
+            {% endif %}
+            <li class="nav-user">
+              <span class="username-badge {% if session.role == 'admin' %}admin-badge{% endif %}">
+                {{ session.username }}
+                {% if session.role == 'admin' %}<span class="role-tag">ADMIN</span>{% endif %}
+              </span>
+              <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+            </li>
+          {% else %}
+            <li><a href="{{ url_for('auth') }}">Login / Sign Up</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+              {% if category == 'success' %}✅{% elif category == 'error' %}❌{% else %}ℹ️{% endif %}
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 CRM System &mdash; Built with Flask &amp; SQLite</p>
+    </div>
+  </footer>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

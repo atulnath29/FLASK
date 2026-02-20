@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Customer Analytics — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content"><h1>Customer Analytics</h1><p>Trust scores, return behavior &amp; customer tags</p></div>
+  <div class="header-actions">
+    <button onclick="recalculate()" class="btn btn-warning">🔄 Recalculate Scores</button>
+    <a href="{{ url_for('billing') }}" class="btn btn-primary">+ New Bill</a>
+  </div>
+</div>
+
+<div class="summary-cards">
+  <div class="summary-card"><div class="card-icon">👥</div><h3>{{ total_customers }}</h3><p>Total Customers</p></div>
+  <div class="summary-card"><div class="card-icon">⭐</div><h3>{{ avg_trust_score }}</h3><p>Avg Trust Score</p></div>
+  <div class="summary-card"><div class="card-icon">🛒</div><h3>{{ total_purchases }}</h3><p>Total Purchases</p></div>
+  <div class="summary-card"><div class="card-icon">✅</div><h3>{{ valid_returns }}</h3><p>Valid Returns</p></div>
+  <div class="summary-card"><div class="card-icon">❌</div><h3>{{ invalid_returns }}</h3><p>Invalid Returns</p></div>
+</div>
+
+<div class="analytics-table-wrap">
+  {% if customers %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th>Purchases</th><th>Valid Returns</th><th>Invalid Returns</th><th>Trust Score</th><th>Tag</th><th>Last Active</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for c in customers %}
+        <tr>
+          <td>
+            <strong>{{ c.name }}</strong>
+            {% if c.phone %}<br><span style="color:#6b7280;font-size:0.78rem">{{ c.phone }}</span>{% endif %}
+          </td>
+          <td style="text-align:center">{{ c.total_purchases or 0 }}</td>
+          <td style="text-align:center;color:#22c55e">{{ c.valid_returns or 0 }}</td>
+          <td style="text-align:center;color:#ef4444">{{ c.invalid_returns or 0 }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="trust-bar">
+                {% set score = c.trust_score or 0 %}
+                {% set pct = [score * 5, 100] | min %}
+                {% if score >= 20 %}{% set color = '#8b5cf6' %}{% elif score >= 10 %}{% set color = '#22c55e' %}{% elif score >= 5 %}{% set color = '#3b6ef8' %}{% elif score >= 1 %}{% set color = '#f59e0b' %}{% else %}{% set color = '#ef4444' %}{% endif %}
+                <div class="trust-fill" style="width: {{ pct ~ '%' }}; background: {{ color | safe }};"></div>
+              </div>
+              <span style="font-weight:700;font-size:0.875rem">{{ score }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="tag-badge tag-{{ (c.tag or 'normal') | lower }}">{{ c.tag or 'Unknown' }}</span>
+          </td>
+          <td style="color:#6b7280;font-size:0.8rem">{{ (c.last_activity or '')[:10] or '—' }}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <a href="{{ url_for('customer_detail', cid=c.id) }}" class="btn btn-sm btn-info">Detail</a>
+              <a href="{{ url_for('customer_profile', customer_id=c.id) }}" class="btn btn-sm btn-secondary">Profile</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:50px;color:#6b7280">No customers yet.</div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function recalculate() {
+  fetch('/analytics/recalculate-trust-scores', {method:'POST'})
+    .then(r => r.json())
+    .then(d => { alert(d.message); location.reload(); });
+}
+</script>
+{% endblock %}

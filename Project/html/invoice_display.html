@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice {{ bill.transaction_id }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:#f4f6fb;color:#1a1a2e;padding:24px}
+    .print-bar{display:flex;gap:10px;margin-bottom:20px;justify-content:center}
+    .btn{padding:10px 20px;border-radius:8px;border:none;font-size:0.875rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+    .btn-primary{background:#3b6ef8;color:#fff}
+    .btn-secondary{background:#f1f5f9;color:#6b7280;border:1px solid #e5e9f0}
+    .invoice-wrapper{max-width:800px;margin:0 auto;background:#fff;border-radius:16px;padding:40px;box-shadow:0 4px 24px rgba(0,0,0,0.08)}
+    .inv-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;border-bottom:3px solid #3b6ef8;padding-bottom:24px}
+    .inv-title h1{font-family:'Playfair Display',serif;font-size:2.5rem;color:#3b6ef8;font-weight:700}
+    .tid{font-family:monospace;font-size:1.1rem;color:#6b7280;margin-top:4px}
+    .inv-meta{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px}
+    .meta-box{background:#f8fafc;border-radius:10px;padding:16px}
+    .meta-box h3{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;margin-bottom:8px}
+    table{width:100%;border-collapse:collapse;margin-bottom:24px}
+    thead th{background:#1a1a2e;color:#fff;padding:10px 12px;text-align:left;font-size:0.8rem}
+    tbody td{padding:10px 12px;border-bottom:1px solid #f1f5f9}
+    tbody tr:last-child td{border-bottom:none}
+    .totals{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+    .t-row{display:flex;justify-content:space-between;gap:80px;font-size:0.9rem;padding:4px 0}
+    .t-row.grand{font-weight:700;font-size:1.1rem;color:#22c55e;border-top:2px solid #e5e9f0;padding-top:10px;margin-top:4px}
+    .footer-note{text-align:center;color:#6b7280;font-size:0.8rem;margin-top:32px;padding-top:20px;border-top:1px solid #e5e9f0}
+    @media print{.print-bar{display:none}body{background:white;padding:0}.invoice-wrapper{box-shadow:none;border-radius:0}}
+  </style>
+</head>
+<body>
+  <div class="print-bar">
+    <button onclick="window.print()" class="btn btn-primary">🖨️ Print Invoice</button>
+    <a href="{{ url_for('view_invoices') }}" class="btn btn-secondary">← Back</a>
+  </div>
+  <div class="invoice-wrapper">
+    <div class="inv-head">
+      <div class="inv-title">
+        <h1>INVOICE</h1>
+        <div class="tid">{{ bill.transaction_id }}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:0.85rem;color:#6b7280">Date</div>
+        <div style="font-weight:700">{{ bill.created_at[:10] }}</div>
+        <div style="font-size:0.85rem;color:#6b7280;margin-top:8px">Served by</div>
+        <div style="font-weight:700">{{ bill.created_by_name }}</div>
+      </div>
+    </div>
+    <div class="inv-meta">
+      <div class="meta-box">
+        <h3>Bill To</h3>
+        <div style="font-weight:700;font-size:1.1rem">{{ bill.customer_name }}</div>
+        {% if bill.phone_number %}<div style="color:#6b7280;margin-top:4px">{{ bill.phone_number }}</div>{% endif %}
+      </div>
+      <div class="meta-box">
+        <h3>Payment Summary</h3>
+        <div>Items: <strong>{{ items|length }}</strong></div>
+        <div>Subtotal: <strong>${{ "%.2f"|format(bill.total_amount) }}</strong></div>
+        <div>Tax: <strong>${{ "%.2f"|format(bill.total_tax) }}</strong></div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>Product</th><th>Qty</th><th>Unit Price</th><th>Tax %</th><th>Total</th></tr></thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td><strong>{{ item.product_name }}</strong></td>
+          <td>{{ item.quantity }}</td>
+          <td>${{ "%.2f"|format(item.unit_price) }}</td>
+          <td>{{ item.tax_rate }}%</td>
+          <td><strong>${{ "%.2f"|format(item.total_price) }}</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="totals">
+      <div class="t-row"><span>Subtotal</span><span>${{ "%.2f"|format(bill.total_amount) }}</span></div>
+      <div class="t-row"><span>Tax</span><span>${{ "%.2f"|format(bill.total_tax) }}</span></div>
+      <div class="t-row grand"><span>Grand Total</span><span>${{ "%.2f"|format(bill.grand_total) }}</span></div>
+    </div>
+    <div class="footer-note">Thank you for your business!</div>
+  </div>
+</body>
+</html>

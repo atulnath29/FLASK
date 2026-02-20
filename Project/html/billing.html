@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Billing — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content">
+    <h1>Create Invoice</h1>
+    <p>Generate bills and manage customer transactions</p>
+  </div>
+  <div class="header-actions">
+    <a href="{{ url_for('view_invoices') }}" class="btn btn-secondary">View Invoices</a>
+    <a href="{{ url_for('bill_history') }}" class="btn btn-secondary">History</a>
+  </div>
+</div>
+
+<div class="billing-container">
+  <!-- LEFT: Customer + Products -->
+  <div>
+    <div class="customer-section">
+      <h2 class="section-title">👤 Customer Information</h2>
+      <div class="form-group">
+        <label>Customer Name *</label>
+        <input type="text" id="customer_name" placeholder="Enter customer name" required>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="text" id="phone_number" placeholder="e.g. 555-0101">
+      </div>
+    </div>
+
+    <div class="products-section">
+      <h2 class="section-title">📦 Add Products</h2>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div class="form-group" style="flex:1;min-width:200px;margin-bottom:0">
+          <label>Select Product</label>
+          <select id="product_select">
+            <option value="">— Choose product —</option>
+            {% for p in products %}
+            <option value="{{ p.id }}" data-price="{{ p.price }}" data-tax="{{ p.tax }}" data-name="{{ p.name }}" data-stock="{{ p.qty }}">
+              {{ p.name }} — ${{ "%.2f"|format(p.price) }} ({{ p.qty }} in stock)
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="width:90px;margin-bottom:0">
+          <label>Qty</label>
+          <input type="number" id="item_qty" value="1" min="1" style="text-align:center">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="addItem()">Add</button>
+      </div>
+
+      <div id="items_list" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Bill Summary -->
+  <div class="bill-summary-section">
+    <h2 class="section-title">🧾 Bill Summary</h2>
+    <div id="summary_items">
+      <p style="color:#6b7280;text-align:center;padding:20px">No items added yet</p>
+    </div>
+    <hr style="border:none;border-top:1px solid #e5e9f0;margin:12px 0">
+    <div class="bill-total-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+    <div class="bill-total-row"><span>Tax</span><span id="tax_total">$0.00</span></div>
+    <div class="bill-total-row grand"><span>Grand Total</span><span id="grand_total" class="bill-grand-total">$0.00</span></div>
+    <button type="button" class="btn btn-primary save-bill-btn" onclick="saveBill()">💾 Save Bill</button>
+    <div id="bill_result" style="margin-top:12px"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let billItems = [];
+
+function addItem() {
+  const sel = document.getElementById('product_select');
+  const qty = parseInt(document.getElementById('item_qty').value) || 1;
+  const pid = sel.value;
+  if (!pid) { alert('Please select a product.'); return; }
+  const opt = sel.options[sel.selectedIndex];
+  const stock = parseInt(opt.dataset.stock);
+  if (qty > stock) { alert(`Only ${stock} in stock!`); return; }
+
+  const fd = new FormData();
+  fd.append('product_id', pid);
+  fd.append('quantity', qty);
+
+  fetch('/billing/add_item', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) { alert(data.error); return; }
+      const item = data.item;
+      // Check if already in list
+      const existing = billItems.find(i => i.product_id == item.product_id);
+      if (existing) {
+        existing.quantity += item.quantity;
+        existing.total_price += item.total_price;
+        existing.tax_amount += item.tax_amount;
+        existing.grand_total += item.grand_total;
+      } else {
+        billItems.push(item);
+      }
+      renderItems();
+    });
+}
+
+function removeItem(idx) {
+  billItems.splice(idx, 1);
+  renderItems();
+}
+
+function renderItems() {
+  const list = document.getElementById('items_list');
+  const summary = document.getElementById('summary_items');
+  if (!billItems.length) {
+    list.innerHTML = '';
+    summary.innerHTML = '<p style="color:#6b7280;text-align:center;padding:20px">No items added yet</p>';
+    document.getElementById('subtotal').textContent = '$0.00';
+    document.getElementById('tax_total').textContent = '$0.00';
+    document.getElementById('grand_total').textContent = '$0.00';
+    return;
+  }
+  list.innerHTML = billItems.map((item, i) => `
+    <div class="bill-item-row">
+      <div style="flex:1">
+        <strong>${item.name}</strong>
+        <span style="color:#6b7280;margin-left:8px">x${item.quantity}</span>
+      </div>
+      <span>$${item.total_price.toFixed(2)}</span>
+      <button onclick="removeItem(${i})" class="btn btn-sm btn-danger" style="padding:4px 8px">✕</button>
+    </div>
+  `).join('');
+
+  summary.innerHTML = billItems.map(item => `
+    <div class="bill-total-row">
+      <span>${item.name} x${item.quantity}</span>
+      <span>$${item.grand_total.toFixed(2)}</span>
+    </div>
+  `).join('');
+
+  const subtotal = billItems.reduce((s,i) => s + i.total_price, 0);
+  const tax = billItems.reduce((s,i) => s + i.tax_amount, 0);
+  const grand = subtotal + tax;
+  document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+  document.getElementById('tax_total').textContent = '$' + tax.toFixed(2);
+  document.getElementById('grand_total').textContent = '$' + grand.toFixed(2);
+}
+
+function saveBill() {
+  const name = document.getElementById('customer_name').value.trim();
+  const phone = document.getElementById('phone_number').value.trim();
+  if (!name) { alert('Please enter customer name.'); return; }
+  if (!billItems.length) { alert('Please add at least one product.'); return; }
+
+  const fd = new FormData();
+  fd.append('customer_name', name);
+  fd.append('phone_number', phone);
+  fd.append('items', JSON.stringify(billItems));
+
+  fetch('/billing/save_bill', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) { alert(data.error); return; }
+      document.getElementById('bill_result').innerHTML = `
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;color:#166534;font-weight:600">
+          ✅ Bill saved! TID: <strong>${data.transaction_id}</strong><br>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <a href="/billing/invoice/${data.bill_id}" class="btn btn-sm btn-info">View Invoice</a>
+            <a href="/billing/invoice-display/${data.bill_id}" class="btn btn-sm btn-secondary">Print</a>
+          </div>
+        </div>`;
+      billItems = [];
+      renderItems();
+      document.getElementById('customer_name').value = '';
+      document.getElementById('phone_number').value = '';
+    });
+}
+</script>
+{% endblock %}

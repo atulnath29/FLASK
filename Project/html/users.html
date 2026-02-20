@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Users — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content"><h1>Users</h1><p>All registered accounts</p></div>
+</div>
+
+<div class="users-table-wrap">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Username</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td style="color:#6b7280">{{ u.id }}</td>
+          <td><strong>{{ u.username }}</strong></td>
+          <td style="color:#6b7280">{{ u.email }}</td>
+          <td><span class="role-{{ u.role }}">{{ u.role.title() }}</span></td>
+          <td style="color:#6b7280;font-size:0.82rem">{{ u.created_at[:10] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

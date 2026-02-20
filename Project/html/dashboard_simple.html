@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Business Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>📊 Business Dashboard</h1>
+            <p>Real-time business analytics and insights</p>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="card-icon">📦</div>
+                <div class="card-content">
+                    <h3>{{ stats.total_products }}</h3>
+                    <p>Total Products</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">👥</div>
+                <div class="card-content">
+                    <h3>{{ stats.total_customers }}</h3>
+                    <p>Total Customers</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">💰</div>
+                <div class="card-content">
+                    <h3>${{ "%.2f"|format(stats.total_inventory_value) }}</h3>
+                    <p>Inventory Value</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">⚠️</div>
+                <div class="card-content">
+                    <h3>{{ stats.low_stock_count }}</h3>
+                    <p>Low Stock Items</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock Alert Section -->
+        <div class="dashboard-section">
+            <h2>🚨 Low Stock Alerts</h2>
+            {% if stats.low_stock_items %}
+                <div class="low-stock-list">
+                    {% for item in stats.low_stock_items %}
+                    <div class="low-stock-item">
+                        <div class="item-info">
+                            <h4>{{ item.name }}</h4>
+                            <p>Current Stock: <span class="stock-count">{{ item.qty }}</span></p>
+                            <p>Category: {{ item.category }}</p>
+                        </div>
+                        <div class="stock-status {% if item.qty == 0 %}out-of-stock{% else %}low-stock{% endif %}">
+                            {% if item.qty == 0 %}
+                                Out of Stock
+                            {% else %}
+                                Low Stock
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="alert-actions">
+                    <button class="btn btn-warning">Reorder All</button>
+                    <button class="btn btn-info">Generate Report</button>
+                </div>
+            {% else %}
+                <div class="no-alerts">
+                    <div class="no-alerts-icon">✅</div>
+                    <h3>All Stock Levels Good</h3>
+                    <p>No items are currently low on stock.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="dashboard-section">
+            <h2>⚡ Quick Actions</h2>
+            <div class="action-buttons">
+                <button class="btn btn-primary">📦 Add Product</button>
+                <button class="btn btn-success">💳 Create Invoice</button>
+                <button class="btn btn-info">👥 View Customers</button>
+                <button class="btn btn-warning">🔄 Process Returns</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate summary cards on load
+            const cards = document.querySelectorAll('.summary-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Add click handlers to action buttons
+            document.querySelectorAll('.btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 100);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

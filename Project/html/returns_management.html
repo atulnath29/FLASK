@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Returns Management — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content"><h1>Returns Management</h1><p>Manage and approve return requests</p></div>
+  <div class="header-actions">
+    <a href="{{ url_for('return_request') }}" class="btn btn-primary">+ New Return</a>
+    <a href="{{ url_for('customer_analytics') }}" class="btn btn-secondary">Analytics</a>
+  </div>
+</div>
+
+<div class="summary-cards">
+  <div class="summary-card"><div class="card-icon">🔄</div><h3>{{ total_returns }}</h3><p>Total Returns</p></div>
+  <div class="summary-card"><div class="card-icon">⏳</div><h3>{{ pending_returns }}</h3><p>Pending</p></div>
+  <div class="summary-card"><div class="card-icon">✅</div><h3>{{ approved_returns }}</h3><p>Approved</p></div>
+  <div class="summary-card"><div class="card-icon">❌</div><h3>{{ rejected_returns }}</h3><p>Rejected</p></div>
+  <div class="summary-card"><div class="card-icon">👍</div><h3>{{ valid_returns }}</h3><p>Valid</p></div>
+  <div class="summary-card"><div class="card-icon">👎</div><h3>{{ invalid_returns }}</h3><p>Invalid</p></div>
+</div>
+
+<div class="returns-table-wrap">
+  {% if returns %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>TID</th><th>Customer</th><th>Product</th><th>Qty</th><th>Amount</th><th>Reason</th><th>Status</th><th>Valid</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for r in returns %}
+        <tr id="ret-{{ r.id }}">
+          <td><span style="font-family:monospace;color:#3b6ef8;font-size:0.82rem">{{ r.transaction_id }}</span></td>
+          <td>
+            <strong>{{ r.customer_name }}</strong>
+            {% if r.phone_number %}<br><span style="color:#6b7280;font-size:0.75rem">{{ r.phone_number }}</span>{% endif %}
+          </td>
+          <td>{{ r.product_name }}</td>
+          <td>{{ r.quantity }}</td>
+          <td>${{ "%.2f"|format(r.total_amount) }}</td>
+          <td style="color:#6b7280;font-size:0.82rem;max-width:150px">{{ r.reason or '—' }}</td>
+          <td id="status-{{ r.id }}"><span class="tag tag-{{ r.status }}">{{ r.status.title() }}</span></td>
+          <td id="valid-{{ r.id }}">{% if r.is_valid %}<span style="color:#22c55e">✅</span>{% else %}<span style="color:#ef4444">❌</span>{% endif %}</td>
+          <td>
+            {% if r.status == 'pending' %}
+            <div style="display:flex;gap:6px">
+              <button onclick="processReturn({{ r.id }}, 'approve', 1)" class="btn btn-sm btn-success">✅ Valid</button>
+              <button onclick="processReturn({{ r.id }}, 'approve', 0)" class="btn btn-sm btn-warning">⚠️ Invalid</button>
+              <button onclick="processReturn({{ r.id }}, 'reject', 0)" class="btn btn-sm btn-danger">❌ Reject</button>
+            </div>
+            {% else %}
+            <span style="color:#6b7280;font-size:0.8rem">{{ r.approved_by_name or 'System' }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:50px;color:#6b7280">No return requests yet.</div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function processReturn(id, action, isValid) {
+  const url = `/returns/${id}/${action}`;
+  const fd = new FormData();
+  if (action === 'approve') fd.append('is_valid', isValid);
+  fetch(url, {method:'POST', body:fd})
+    .then(r => r.json())
+    .then(d => {
+      if (d.success) location.reload();
+      else alert(d.error);
+    });
+}
+</script>
+{% endblock %}

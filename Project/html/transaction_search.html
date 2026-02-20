@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Transaction Search — CRM System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="header-content"><h1>Transaction Search</h1><p>Look up any bill by Transaction ID</p></div>
+  <div class="header-actions">
+    <a href="{{ url_for('bill_history') }}" class="btn btn-secondary">Bill History</a>
+  </div>
+</div>
+
+<div class="search-container">
+  <div class="search-card">
+    <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:8px">🔍 Search by TID</h2>
+    <p style="color:#6b7280;font-size:0.875rem;margin-bottom:16px">Enter a Transaction ID (e.g. TID0001 or just 0001)</p>
+    <form method="POST" class="search-form">
+      <input type="text" name="tid" placeholder="TID0001" value="{{ searched_tid or '' }}" required>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </div>
+
+  {% if result %}
+  <div class="result-card">
+    <h3 style="font-weight:700;margin-bottom:16px;color:#166534">✅ Found: {{ result.bill.transaction_id }}</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div><span style="color:#6b7280;font-size:0.8rem">Customer</span><br><strong>{{ result.bill.customer_name }}</strong></div>
+      <div><span style="color:#6b7280;font-size:0.8rem">Phone</span><br><strong>{{ result.bill.phone_number or '—' }}</strong></div>
+      <div><span style="color:#6b7280;font-size:0.8rem">Grand Total</span><br><strong style="color:#22c55e">${{ "%.2f"|format(result.bill.grand_total) }}</strong></div>
+      <div><span style="color:#6b7280;font-size:0.8rem">Date</span><br><strong>{{ result.bill.created_at[:10] }}</strong></div>
+    </div>
+    <div class="table-wrap" style="background:#fff;border-radius:8px;overflow:hidden">
+      <table>
+        <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+        <tbody>
+          {% for item in result.items %}
+          <tr>
+            <td>{{ item.product_name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ "%.2f"|format(item.unit_price) }}</td>
+            <td><strong>${{ "%.2f"|format(item.total_price) }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <a href="{{ url_for('view_invoice', bill_id=result.bill.id) }}" class="btn btn-info btn-sm">View Invoice</a>
+      <a href="{{ url_for('display_invoice', bill_id=result.bill.id) }}" class="btn btn-secondary btn-sm">Print</a>
+      <a href="{{ url_for('return_request') }}" class="btn btn-warning btn-sm">Return Request</a>
+    </div>
+  </div>
+  {% elif error %}
+  <div class="error-card">
+    <h3 style="font-weight:700;color:#991b1b">❌ Not Found</h3>
+    <p style="color:#991b1b;margin-top:6px">No transaction found for "<strong>{{ searched_tid }}</strong>"</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — CRM System{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+  <div class="dashboard-welcome">
+    <h1>Welcome back, <span class="username">{{ session.username }}</span>
+      {% if session.role == 'admin' %}<span class="admin-crown">👑 Admin</span>{% endif %}
+    </h1>
+    <p>Business Overview &amp; Management Dashboard</p>
+  </div>
+  <div class="dashboard-actions">
+    <a href="{{ url_for('billing') }}" class="btn btn-primary">+ New Bill</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+  </div>
+</div>
+
+<!-- KPI Stats -->
+<div class="stats-overview">
+  <div class="stat-card primary">
+    <div class="stat-icon">📦</div>
+    <div class="stat-content">
+      <h3>{{ stats.total_products }}</h3><p>Total Products</p>
+    </div>
+  </div>
+  <div class="stat-card success">
+    <div class="stat-icon">💰</div>
+    <div class="stat-content">
+      <h3>${{ "{:,.2f}".format(stats.total_inventory_value) }}</h3><p>Inventory Value</p>
+    </div>
+  </div>
+  <div class="stat-card info">
+    <div class="stat-icon">👥</div>
+    <div class="stat-content">
+      <h3>{{ stats.total_customers }}</h3><p>Total Customers</p>
+    </div>
+  </div>
+  <div class="stat-card warning">
+    <div class="stat-icon">⚠️</div>
+    <div class="stat-content">
+      <h3>{{ stats.low_stock_count }}</h3><p>Low Stock Items</p>
+    </div>
+  </div>
+  <div class="stat-card revenue">
+    <div class="stat-icon">💵</div>
+    <div class="stat-content">
+      <h3>${{ "{:,.2f}".format(stats.total_revenue) }}</h3><p>Total Revenue</p>
+    </div>
+  </div>
+  <div class="stat-card returns">
+    <div class="stat-icon">🔄</div>
+    <div class="stat-content">
+      <h3>{{ stats.pending_returns }}</h3><p>Pending Returns</p>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-content">
+
+  <!-- Low Stock Alerts -->
+  <div class="dashboard-section">
+    <h2>🚨 Low Stock Alerts</h2>
+    {% if stats.low_stock_items %}
+      <div class="low-stock-list">
+        {% for item in stats.low_stock_items %}
+          <div class="low-stock-item">
+            <div class="item-info">
+              <h4>{{ item.name }}</h4>
+              <p>Stock: <span class="stock-count">{{ item.qty }}</span> &bull; {{ item.category }}</p>
+            </div>
+            <div class="stock-status {% if item.qty == 0 %}out-of-stock{% else %}low-stock{% endif %}">
+              {% if item.qty == 0 %}Out of Stock{% else %}Low Stock{% endif %}
+            </div>
+            <a href="{{ url_for('edit_product', pid=item.id) }}" class="btn btn-sm btn-warning">Restock</a>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-alerts">
+        <div class="success-icon">✅</div>
+        <h3>All Stock Levels Healthy</h3>
+        <p>No items are currently below minimum stock levels.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Recent Bills -->
+  <div class="dashboard-section">
+    <h2>🧾 Recent Bills</h2>
+    {% if recent_bills %}
+      <div class="bills-table">
+        <div class="table-header">
+          <span>TID</span><span>Customer</span><span>Total</span><span>By</span><span>Date</span><span>Action</span>
+        </div>
+        {% for b in recent_bills %}
+        <div class="table-row">
+          <span class="tid">{{ b.transaction_id }}</span>
+          <span>{{ b.customer_name }}</span>
+          <span class="amount">${{ "{:,.2f}".format(b.grand_total) }}</span>
+          <span>{{ b.by_name }}</span>
+          <span class="date">{{ b.created_at[:10] }}</span>
+          <a href="{{ url_for('view_invoice', bill_id=b.id) }}" class="btn btn-sm btn-info">View</a>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state"><p>No bills yet. <a href="{{ url_for('billing') }}">Create one →</a></p></div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+  <h2>⚡ Quick Actions</h2>
+  <div class="actions-grid">
+    <a href="{{ url_for('add_product') }}" class="action-card">
+      <div class="action-icon">➕</div>
+      <h4>Add Product</h4><p>Add new inventory item</p>
+    </a>
+    <a href="{{ url_for('billing') }}" class="action-card">
+      <div class="action-icon">🧾</div>
+      <h4>Create Bill</h4><p>Generate new invoice</p>
+    </a>
+    <a href="{{ url_for('customer_analytics') }}" class="action-card">
+      <div class="action-icon">📊</div>
+      <h4>Analytics</h4><p>Customer trust scores</p>
+    </a>
+    <a href="{{ url_for('returns_management') }}" class="action-card">
+      <div class="action-icon">🔄</div>
+      <h4>Returns</h4><p>Manage return requests</p>
+    </a>
+    <a href="{{ url_for('transaction_search') }}" class="action-card">
+      <div class="action-icon">🔍</div>
+      <h4>Search TID</h4><p>Find any transaction</p>
+    </a>
+    <a href="{{ url_for('view_invoices') }}" class="action-card">
+      <div class="action-icon">📋</div>
+      <h4>Invoices</h4><p>View all invoices</p>
+    </a>
+  </div>
+</div>
+{% endblock %}

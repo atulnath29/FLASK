@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — CRM System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="card-container">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-box">
+            {% for category, message in messages %}
+              <div class="flash-msg {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <!-- LOGIN -->
+      <div class="auth-card {% if show == 'signup' %}hidden{% endif %}" id="loginCard">
+        <div class="card-header">
+          <span class="label">Welcome back</span>
+          <h1>Login</h1>
+        </div>
+        <form class="auth-form" method="POST" action="/auth">
+          <input type="hidden" name="form_type" value="login">
+          <div class="field">
+            <label for="login-username">Username</label>
+            <input type="text" id="login-username" name="username" placeholder="your_username" autocomplete="off" required />
+          </div>
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" name="password" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="btn-primary">Login</button>
+        </form>
+        <p class="switch-text">Don't have an account? <a href="#" onclick="switchCard('signup')">Sign up</a></p>
+        <p class="admin-hint">Admin login: <strong>admin</strong> / <strong>admin123</strong></p>
+      </div>
+
+      <!-- SIGN UP -->
+      <div class="auth-card {% if show == 'signup' %}{% else %}hidden{% endif %}" id="signupCard">
+        <div class="card-header">
+          <span class="label">Join us</span>
+          <h1>Create Account</h1>
+        </div>
+        <form class="auth-form" method="POST" action="/auth">
+          <input type="hidden" name="form_type" value="signup">
+          <div class="field">
+            <label for="signup-username">Username</label>
+            <input type="text" id="signup-username" name="username" placeholder="your_username" autocomplete="off" required />
+          </div>
+          <div class="field">
+            <label for="signup-email">Email</label>
+            <input type="email" id="signup-email" name="email" placeholder="you@example.com" required />
+          </div>
+          <div class="field">
+            <label for="signup-password">Password <span class="hint">Min 6 characters</span></label>
+            <input type="password" id="signup-password" name="password" placeholder="••••••••" required />
+          </div>
+          <div class="field">
+            <label for="signup-confirm">Confirm Password</label>
+            <input type="password" id="signup-confirm" name="confirm_password" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="btn-primary">Create Account</button>
+        </form>
+        <p class="switch-text">Already have an account? <a href="#" onclick="switchCard('login')">Login</a></p>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function switchCard(target) {
+      const login = document.getElementById('loginCard');
+      const signup = document.getElementById('signupCard');
+      if (target === 'signup') {
+        login.classList.add('hidden');
+        signup.classList.remove('hidden');
+      } else {
+        signup.classList.add('hidden');
+        login.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
